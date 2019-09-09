@@ -115,7 +115,7 @@ function errorSafe(func, mapper) {
 function buidPasswordVerifier(rules) {
     validateRules(rules);
     return function (input) {
-        const strategy = rules
+        const strategy = () => rules
             .map(rule => rule(input))
             .filter(result => !result.passed)
             .map(failed => failed.reason);
