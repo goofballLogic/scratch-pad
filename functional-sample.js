@@ -133,7 +133,8 @@ describe("Given a rule which can throw an error", () => {
         let action;
         beforeEach(() => {
             const passwordVerifier = buildPasswordVerifier(rules);
-            action = () => passwordVerifier(null);
+            const poisonInput = null; // causes our rule to throw an error
+            action = () => passwordVerifier(poisonInput);
         })
         it("Should not throw an error", () => expect(action).not.toThrow());
         it("Should return a 'fail' reason", () => expect(action()[0]).toContain("fail"));
