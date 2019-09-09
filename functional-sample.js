@@ -104,22 +104,18 @@ implemented. One could argue that it would be best to let our error "bubble up t
 choose to log our internal error, and simply return a generic failure for this password instead, which I will demonstrate
 below.*/
 
-function errorSafe(func, mapper) {
-    try {
-        func();
-    } catch (err) {
-        return mapper(err);
-    }
-}
-
-function buidPasswordVerifier(rules) {
+function buidPasswordVerifier(rules, log) {
     validateRules(rules);
     return function (input) {
-        const strategy = () => rules
-            .map(rule => rule(input))
-            .filter(result => !result.passed)
-            .map(failed => failed.reason);
-        return errorSafe(strategy, ["Verification failed"]);
+        try {
+            return rules
+                .map(rule => rule(input))
+                .filter(result => !result.passed)
+                .map(failed => failed.reason);
+        } catch(err) {
+            log.error(err);
+            return ["Verification failed"];
+        }
     };
 }
 
@@ -140,3 +136,5 @@ describe("Given a rule which can throw an error", () => {
         it("Should return a 'fail' reason", () => expect(action()[0]).toContain("fail"));
     })
 });
+
+// Note that we still haven't verified that our logging works. We'll do that later on when we tackle mocks
